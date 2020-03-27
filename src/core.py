@@ -29,7 +29,6 @@ def search_param(script):
 
 def validate(chat_id, mensagem, *parametro):
     try:
-        print(mensagem)
         comando = localizar_comando(mensagem)
 
         if comando.script is not None:

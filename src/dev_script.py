@@ -6,12 +6,12 @@ from tools.http_cats import get_photo
 def processar_saida(funcao, saida, *parametro):
     exec(funcao, globals())
     if parametro:
-        parametros = script(*parametro)
+        valores = script(*parametro)
     else:
-        parametros = script()
+        valores = script()
     globals().pop('script')
 
-    return saida.format(**parametros)
+    return saida.format(**valores)
 
 
 def executar(comando, parametro=None):
