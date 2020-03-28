@@ -16,7 +16,7 @@ class DeveloperParameterError(Exception): ...
 
 def send(chat_id, resposta):
     if 'photo' in resposta:
-            BOT.sendPhoto(chat_id, resposta[5:])
+        BOT.sendPhoto(chat_id, resposta[5:])
     else:
         BOT.sendMessage(chat_id, resposta)
 
@@ -31,7 +31,12 @@ def validate(chat_id, mensagem, *parametro):
     try:
         comando = localizar_comando(mensagem)
 
+        
+
         if comando.script is not None:
+            if not 'script' in comando.script:
+                raise NameError
+
             if not search_param(comando.script):
                 if parametro:
                     raise ParameterError
