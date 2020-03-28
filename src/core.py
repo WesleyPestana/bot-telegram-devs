@@ -2,14 +2,14 @@ import telepot
 import re
 from conf.settings import TELEGRAM_TOKEN
 from services import localizar_comando
-from dev_script import executar
+from dev_script import processar_saida
 
 
 class ParameterError(Exception): ...
 
 class RequiredParameterError(Exception): ...
 
-class UserParameterError(Exception): ...
+class OverParameterError(Exception): ...
 
 class DeveloperParameterError(Exception): ...
 
@@ -21,7 +21,7 @@ def send(chat_id, resposta):
         BOT.sendMessage(chat_id, resposta)
 
 
-def search_param(script):
+def search_parameter(script):
     if ',' in script.split(':')[0]:
         raise DeveloperParameterError
     return re.search('script[(][a-z_][a-z_]*[)]', script)
@@ -31,24 +31,22 @@ def validate(chat_id, mensagem, *parametro):
     try:
         comando = localizar_comando(mensagem)
 
-        
-
         if comando.script is not None:
-            if not 'script' in comando.script:
+            if not 'script' in comando.script.split('(')[0]:
                 raise NameError
 
-            if not search_param(comando.script):
+            if not search_parameter(comando.script):
                 if parametro:
                     raise ParameterError
-                return executar(comando)
+                return processar_saida(comando)
 
             if len(parametro) > 1:
-                raise UserParameterError
+                raise OverParameterError
 
-            if search_param(comando.script):
+            if search_parameter(comando.script):
                 if not parametro:
                     raise RequiredParameterError
-                return executar(comando, *parametro)
+                return processar_saida(comando, *parametro)
             
         return comando.saida
 
@@ -61,7 +59,7 @@ def validate(chat_id, mensagem, *parametro):
     except RequiredParameterError:
         return 'Este comando necessita de um parâmetro, porém você não me enviou.'
     
-    except UserParameterError:
+    except OverParameterError:
         return f'Por favor, certifique-se de que apenas um parâmetro seja enviado. Recebi {list(parametro)}'
 
     except DeveloperParameterError:
